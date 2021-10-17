@@ -1,0 +1,25 @@
+Bridge ecobee:account:redacted_binding "Ecobee Account" [ apiKey="REDACTED", refreshIntervalNormal=30, refreshIntervalQuick=5, apiTimeout=20, discoveryEnabled=false ] {
+    Bridge thermostat REDACTED "Ecobee First Floor Thermostat" [ thermostatId="REDACTED" ] {
+        Thing sensor ei-0 "Ecobee Sensor Thermostat" [ sensorId="ei:0" ] {
+            Channels:
+                Type sensorTemperature : temperature [ ]
+                Type sensorHumidity : humidity [ ]
+                Type sensorOccupancy : occupancy [ ]
+        }
+        Thing sensor rs-101 "Ecobee Sensor Room 1" [ sensorId="rs:101" ] {
+            Channels: 
+                Type sensorTemperature : temperature [ ]
+                Type sensorOccupancy : occupancy [ ]
+        }
+        Thing sensor rs-100 "Ecobee Sensor Room 2" [ sensorId="rs:100" ] {
+            Channels:
+                Type sensorTemperature : temperature [ ]
+                Type sensorOccupancy : occupancy [ ]
+        }
+        Thing sensor rs-102 "Ecobee Sensor Room 3" [ sensorId="rs:102" ] {
+            Channels:
+                Type sensorTemperature : temperature [ ]
+                Type sensorOccupancy : occupancy [ ]
+        }
+    }
+}

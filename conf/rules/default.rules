@@ -1,0 +1,132 @@
+rule "Set Temperature Hold"
+when
+    Item SetTemperatureHold received command
+then
+    if (UserCool.state instanceof QuantityType &&  UserHeat.state instanceof QuantityType) {
+        switch Settings_HvacMode.state.toString {
+            case "cool",
+            case "heat",
+            case "auto" :  {
+                val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+                ecobeeActions.setHold(UserCool.state as QuantityType, UserHeat.state as QuantityType)
+            }
+            case "off"  :  {
+                logWarn("ecobee", "HVAC mode is off, temperature hold ignored")
+                return
+            }
+            case "default" : {
+                logWarn("ecobee", "HVAC mode '{}' is unknown, temperature hold ignored", Settings_HvacMode.state)
+            }
+        }
+    }
+end
+
+
+rule "Set Climate Ref Hold"
+when
+    Item UserClimateRef received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    if (receivedCommand.toString.equals("resume")) {
+        ecobeeActions.resumeProgram(true)
+    } else {
+        ecobeeActions.setHold(receivedCommand.toString)
+    }
+end
+
+
+rule "Send Message"
+when
+    Item SendMessage received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    var Boolean isSuccess
+    isSuccess = ecobeeActions.sendMessage(receivedCommand.toString)
+    logInfo("ecobee", "Action 'sendMessage' returned '{}'", isSuccess)
+end
+
+
+rule "Acknowledge Alert"
+when
+    Item AcknowledgeAlert received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    var Boolean isSuccess
+    isSuccess = ecobeeActions.acknowledge(receivedCommand.toString, "accept", null)
+    logInfo("ecobee", "Action 'acknowledge' returned '{}'", isSuccess)
+end
+
+
+rule "Get Alerts"
+when
+    Item GetAlerts received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    var String alerts = ecobeeActions.getAlerts()
+    if (alerts !== null) {
+        val int numElements = Integer.parseInt(transform("JSONPATH", "$.length()", alerts))
+        logInfo("ecobee", "Alerts: There are {} alerts in array", numElements)
+        var String ref
+        var String text
+        for (var int i=0; i < numElements; i++) {
+            ref = transform("JSONPATH", "$.[" + i + "].acknowledgeRef", alerts)
+            text = transform("JSONPATH", "$.[" + i + "].text", alerts)
+            logInfo("test", "Alerts: Alert '{}' with acknowledgeRef '{}'", text, ref)
+        }
+    } else {
+        logInfo("ecobee", "Alerts: No alerts!!!")
+    }
+end
+
+
+rule "Get Events"
+when
+    Item GetEvents received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    var String events = ecobeeActions.getEvents()
+    if (events !== null) {
+        val int numElements = Integer.parseInt(transform("JSONPATH", "$.length()", events))
+        logInfo("ecobee", "Events: There are {} events in array", numElements)
+    } else {
+        logInfo("ecobee", "Events: No events!!!")
+    }
+end
+
+
+rule "Get Climates"
+when
+    Item GetClimates received command
+then
+    val ecobeeActions = getActions("ecobee","ecobee:thermostat:redacted_binding:redacted_thermostat_id")
+    var String climates = ecobeeActions.getClimates()
+    if (climates !== null) {
+        val int numElements = Integer.parseInt(transform("JSONPATH", "$.length()", climates))
+        logInfo("ecobee", "Climates: There are {} climates in array", numElements)
+        var String climateRef
+        for (var int i=0; i < numElements; i++) {
+            climateRef = transform("JSONPATH", "$.[" + i + "].climateRef", climates)
+            logInfo("test", "Climates: Climate Ref: {}", climateRef)
+        }
+    } else {
+        logInfo("ecobee", "Climates: No climates!!!")
+    }
+end
+
+rule "Thermostat Temp Setting"
+when
+    Time cron "0 * * ? * * *"
+then
+    logInfo("ecobee", "Thermostat Loop start") 
+    switch (S0_Temperature) {
+        case S0_Temperature.getStateAs(DecimalType) > 22.2: {
+            logInfo("ecobee", "greater than 22.2")
+            Settings_FanMinOnTime.sendCommand(0)
+        }
+        case S0_Temperature.getStateAs(DecimalType) < 20.6: {
+            logInfo("ecobee", "less than 25.3")
+            Settings_FanMinOnTime.sendCommand(55)
+        }
+    }
+    logInfo("ecobee", "Thermostat Loop end") 
+end

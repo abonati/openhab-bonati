@@ -1,0 +1,42 @@
+sitemap our_home label="Our Home" {
+    Frame label="Outside" icon="garden" {
+        Group item=OU_Balcony
+    }
+
+    Frame label="Cellar" icon="cellar" {
+        Group item=C_Basement
+    }
+
+    Frame label="Ground Floor" icon="groundfloor" {
+        Group item=GF_Bedroom
+        Group item=GF_LivingRoom
+    }
+
+    Frame {
+        Text label="Motion Sensor" icon="motion" {
+            Default item=OU_Balcony_Motion label="Balcony"
+            Default item=C_Basement_Motion label="Basement"
+            Default item=GF_Bedroom_Motion label="Bedroom"
+            Default item=GF_LivingRoom_Motion label="Living Room"
+        }
+
+        Text label="Temperature" icon="temperature" {
+            Default item=OU_Balcony_Temperature label="Balcony"
+            Default item=C_Basement_Temperature label="Basement"
+            Default item=GF_Bedroom_Temperature label="Bedroom"
+            Default item=GF_LivingRoom_Temperature label="Living Room"
+        }
+
+        Text label="Fan" icon="fan_ceiling" {
+            Switch item=Settings_FanMinOnTime label="Fan Mode [%s]" mappings=[55=on,0=off]
+        }
+
+        Text label="Heating" icon="heating" {
+            Default item=GF_LivingRoom_Heating label="Living Room"
+        }
+
+        Text label="Humidity" icon="humidity" {
+            Default item=GF_LivingRoom_Humidity label="Living Room"
+        }
+    }
+}

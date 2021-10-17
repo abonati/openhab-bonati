@@ -1,0 +1,7 @@
+# ignore all logs
+*.log
+# ignore .vscode
+*.vscode
+# ignore runtime/userdata
+*runtime
+*userdata
