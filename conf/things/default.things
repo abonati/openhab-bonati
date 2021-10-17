@@ -1,5 +1,5 @@
-Bridge ecobee:account:redacted_binding "Ecobee Account" [ apiKey="REDACTED", refreshIntervalNormal=30, refreshIntervalQuick=5, apiTimeout=20, discoveryEnabled=false ] {
-    Bridge thermostat REDACTED "Ecobee First Floor Thermostat" [ thermostatId="REDACTED" ] {
+Bridge ecobee:account:cbc4f2bf "Ecobee Account" [ apiKey="REDACTED", refreshIntervalNormal=30, refreshIntervalQuick=5, apiTimeout=20, discoveryEnabled=false ] {
+    Bridge thermostat 511812002583 "Ecobee First Floor Thermostat" [ thermostatId="511812002583" ] {
         Thing sensor ei-0 "Ecobee Sensor Thermostat" [ sensorId="ei:0" ] {
             Channels:
                 Type sensorTemperature : temperature [ ]
